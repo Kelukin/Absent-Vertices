@@ -14,7 +14,7 @@ public class FastMap {
         return value[key];
     }
     public void setValue(int key, int value){
-        add(key);
+        if(add(key))
         this.value[key] = value;
     }
     public void clear() {

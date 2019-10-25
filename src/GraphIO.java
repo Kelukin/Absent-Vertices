@@ -31,5 +31,5 @@ public class GraphIO {
 			for (int e : adj[i]) out.putInt(e);
 		}
 	}
-	
+
 }

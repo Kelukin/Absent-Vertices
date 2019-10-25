@@ -90,6 +90,18 @@ public class VCSolver {
 	}
 	
 	FastSet used;
+	void clear(){
+		fill(y, 1);
+		fill(x, -1);
+		fill(in, -1);
+		fill(out, -1);
+		rn = opt = n;
+		modifiedN = 0;
+	}
+	public void reInitializeVertex(int v, int a){
+		clear();
+		set(v,a);
+	}
 	
 	int deg(int v) {
 		Debug.check(x[v] < 0);
@@ -448,7 +460,7 @@ public class VCSolver {
 						que[qt++] = n + out[v];
 					}
 				}
-				ok = false;
+//				ok = false;
 				if (ok) {
 					for (int j = 0; j < qt; j++) {
 						v = que[j];

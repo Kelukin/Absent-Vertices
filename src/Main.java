@@ -4,6 +4,7 @@ import static java.util.Arrays.*;
 import java.io.*;
 import java.util.*;
 
+import fudan.kelukin.data.MISGraph;
 import tc.wata.debug.*;
 import tc.wata.io.*;
 import tc.wata.util.*;
@@ -31,7 +32,21 @@ public class Main {
 	
 	int[] vertexID;
 	int[][] adj;
-	
+
+	public void write_kelukin(File file){
+		int m = 0;
+		int n = adj.length;
+		for (int i = 0; i < n; i++) m += adj[i].length;
+		System.err.printf("!!!%d%n",m);
+		long size = 4L * (1 + 1 + m);
+		System.out.printf("%d %d%n",n, m/2);
+		for (int i = 0; i < n; i++) {
+			for (int e : adj[i])
+				if(e > i){
+					System.out.printf("%d %d%n",i,e);
+				}
+		}
+	}
 	void read(String file) {
 		if (file.endsWith(".dat")) {
 			GraphIO io = new GraphIO();
@@ -65,6 +80,7 @@ public class Main {
 	}
 	
 	void run(String file) {
+		long start, end;
 		System.err.println("reading the input graph...");
 		read(file);
 		if (debug > 0) Stat.setShutdownHook();
@@ -72,6 +88,14 @@ public class Main {
 		for (int i = 0; i < adj.length; i++) m += adj[i].length;
 		m /= 2;
 		System.err.printf("n = %d, m = %d%n", adj.length, m);
+		start = System.currentTimeMillis();
+		MISGraph misGraph = new MISGraph(adj);
+		System.err.printf("Build successfully!%n");
+		misGraph.initializedTriangleCnt();
+		end = System.currentTimeMillis();
+		while(misGraph.clear_new_minus_queue()==true);
+		System.err.printf("time = %.3f%n",  1e-3 * (end - start));
+		misGraph.printCnt();
 		VCSolver vc = new VCSolver(adj, adj.length);
 		VCSolver.nBranchings = 0;
 		VCSolver.REDUCTION = reduction;
@@ -79,7 +103,6 @@ public class Main {
 		VCSolver.BRANCHING = branching;
 		VCSolver.outputLP = outputLP;
 		VCSolver.debug = debug;
-		long start, end;
 		try (Stat stat = new Stat("solve")) {
 			start = System.currentTimeMillis();
 			vc.solve();
@@ -87,6 +110,21 @@ public class Main {
 		}
 		System.err.printf("opt = %d, time = %.3f%n", vc.opt, 1e-3 * (end - start));
 		read(file);
+		int opt = vc.opt;
+		Boolean ok = true;
+		for(int i=0;i<adj.length && ok;i++){
+			if(misGraph.category[i] == 3){
+				vc = new VCSolver(adj, adj.length);
+				vc.reInitializeVertex(i,0);
+				vc.solve();
+				if(opt == vc.opt)
+					ok = false;
+//				else System.err.printf("new: %d, old: %d%n", vc.opt, opt);
+			}
+		}
+		if(ok)
+			System.err.printf("OK");
+		else  System.err.printf("Error");
 		int sum = 0;
 		for (int i = 0; i < adj.length; i++) {
 			sum += vc.y[i];
