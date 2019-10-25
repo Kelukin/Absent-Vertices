@@ -12,11 +12,10 @@ public class MISGraph extends Graph{
     static int MIRROR = 2;
     static int CHAIN = 3;
     static int BRUFORCE = 4;
-    public int mis_size;
     public  FastSet used;
     public  FastMap quickMap;
     int mirror_threshold = 3;
-    int chain_length_threshold = 3;
+    int chain_length_threshold = 5;
     int[] dominationDegree;
     int[] neighborCnt_dg2;
     int[] iter;
@@ -50,7 +49,6 @@ public class MISGraph extends Graph{
         domination_cnt = mirror_cnt = chain_cnt = 0;
         generate_graph(edges);
         used = new FastSet(vertex_num);
-        System.err.printf("%d",vertex_num);
         neighborCnt_dg2 = new int[vertex_num];
         dominationDegree = new int[vertex_num];
         dominationRel = new HashSet<>();
@@ -64,9 +62,6 @@ public class MISGraph extends Graph{
                     int node_z = endNode[j];
                     neighborCnt_dg2[node_z]++;
                 }
-    }
-    void set_mis_size(int mis_size){
-        this.mis_size = mis_size;
     }
     void generate_graph(double alpha){
         ArrayList<Integer>[] edges = new ArrayList[vertex_num];
@@ -105,6 +100,24 @@ public class MISGraph extends Graph{
             if(x[i] == 1 && category[i] == 0)
                 category[i] = -3;//Maybe V_minus
         }
+    }
+    public void learn_from_opt(int[] vc_opt, int mis_size){
+        int sum = 0;
+        for(int i=0; i<vertex_num; i++)
+            if(vc_opt[i] <= 0){
+                sum++;
+                if(category[i] == 0)    category[i] = -1;
+                else if(category[i] == -3){
+                    oracle(i,2);
+                }
+            }else if(vc_opt[i] >0){
+                if(category[i] == 0) category[i] = -3;
+                else if(category[i] == -1){
+                    oracle(i, 2);
+                }
+            }
+            Debug.check(mis_size == sum);
+        //maybe do more to auxiliary graph?
     }
     void addDomination(int node_x, int node_y, Boolean deleteState){
         if(!dominationRel.add(new Pair(node_x, node_y)))
@@ -155,7 +168,18 @@ public class MISGraph extends Graph{
             }
     }
 
+    public void oracle(int u, int a){
+        //oracle tells that u's category is `a`.
+        category[u] = a;
+        if(a == 1){
+            for(int i = first[u]; i != -1; i = nxt[i]) {
+                deleteNode(endNode[i]);
+            }
+        }else if(a == 2){
 
+        }else if(a == 3)
+            deleteNode(u);
+    }
     Boolean meetChainCondition(int v){
         return category[v]<=0 && dominationDegree[v] !=0 && neighborCnt_dg2[v] != 0;
     }
@@ -242,7 +266,7 @@ public class MISGraph extends Graph{
         //v 原本degree 为2 但已经不再是了
         for(int i = first[v]; i != -1 ;i = nxt[i]){
             int u = endNode[i];
-            if(category[u]!=3){
+            if(category[u]<=0){
                 Boolean tmp = meetChainCondition(u);
                 neighborCnt_dg2[u]+=a;
                 if(!tmp && meetChainCondition(u))
@@ -274,6 +298,7 @@ public class MISGraph extends Graph{
                 increaseDegree2Neighbor(u, 1);
             else if(nodeDegree[u]==1)
                 increaseDegree2Neighbor(u, -1);
+            else if(nodeDegree[u] <= 0) category[u] = 1;
             tmp = z;
         }
         first[x] = -1;
@@ -306,7 +331,7 @@ public class MISGraph extends Graph{
         for (int i = 0; i < vertex_num; i++) ps[i] = -2;
         used.clear();
         used.add(v);
-        for (int i = first[v]; i != -1 ; i = nxt[i])if(category[endNode[i]]!=3){
+        for (int i = first[v]; i != -1 ; i = nxt[i])if(category[endNode[i]]<=0){
             int u = endNode[i];
             used.add(u);
             ps[u] = -1;
@@ -315,8 +340,7 @@ public class MISGraph extends Graph{
             int u = endNode[i];
             for (int j = first[u]; j != -1; j = nxt[j]){
                 int w = endNode[j];
-                if (category[w
-                        ] != 3 && used.add(w)) {
+                if (category[w] <=0 && used.add(w)) {
                     int c1 = nodeDegree[v];
                     for (int k = first[w]; k != -1; k = nxt[k]){
                         int z = endNode[k];
@@ -353,7 +377,7 @@ public class MISGraph extends Graph{
     
     Boolean dfs_find_domination_chain(int no, int node_x, int bf_node, int length){
         //使用前需要将used进行clear
-        if(length > mirror_threshold)
+        if(length > chain_length_threshold)
             return false;
         used.add(node_x);
         if(no % 2 == 1){
@@ -376,7 +400,7 @@ public class MISGraph extends Graph{
                         if(dominationRel.contains(new Pair(endNode[j],node_y)) &&
                                 !used.get(endNode[j])){
                             category[node_x] = 1;
-                            if(category[node_y] != 3)
+                            if(category[node_y] <= 0)
                             {
                                 deleteNode(node_y, CHAIN);
                             }
@@ -392,9 +416,9 @@ public class MISGraph extends Graph{
                         node_y != bf_node && !used.get(node_y)){
                     //进行一些临时删除操作 也可以不
                     if(dfs_find_domination_chain(no+1, node_y, node_x,length+1)){
-                        if(category[node_x] == 3 ){
+//                        if(category[node_x] == 3 ){
                             deleteNode(node_x, CHAIN);
-                        }
+//                        }
                         return true;
                     }
                 }
@@ -559,7 +583,8 @@ public class MISGraph extends Graph{
         }
         
         public void addDomination_mis_graph(int x, int y){
-            if(category[x] < 0 || category[y] < 0) return;
+            if(category[x] < 0 || category[y] < 0
+                    || MISGraph.this.category[y] == -1) return;
             waitDegree[x]++;
             if(category[y] == 1){
                 if(waitDegree[y] != 0)  category[y] = 4;
@@ -582,6 +607,7 @@ public class MISGraph extends Graph{
             int tmp = addEdge(x,y);
             check_edgeNO.push(tmp); check_node.push(y);
         }
+        public void oracle(int u, int kind){}
         public void deleteNode_mis_graph(int v){
             //TODO
             //外部mis_graph当中发现了点x作为V^- 时将其周围的点进行删除

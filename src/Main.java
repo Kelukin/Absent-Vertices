@@ -78,7 +78,29 @@ public class Main {
 			vertexID = conv.vertexID;
 		}
 	}
-	
+
+	void run2(String file){
+		MISModifier.to_learn = true;
+		VCSolver.nBranchings = 0;
+		VCSolver.REDUCTION = reduction;
+		VCSolver.LOWER_BOUND = lb;
+		VCSolver.BRANCHING = branching;
+		VCSolver.outputLP = outputLP;
+		VCSolver.debug = debug;
+		read(file);
+		if (debug > 0) Stat.setShutdownHook();
+		int m = 0;
+		for (int i = 0; i < adj.length; i++) m += adj[i].length;
+		m /= 2;
+		System.err.printf("n = %d, m = %d%n", adj.length, m);
+		MISModifier misModifier = new MISModifier(adj);
+		long start, end;
+		start = System.currentTimeMillis();
+		misModifier.categoryVertices();
+		end = System.currentTimeMillis();
+		System.err.printf("category time = %.3f%n",  1e-3 * (end - start));
+		misModifier.printResult();
+	}
 	void run(String file) {
 		long start, end;
 		System.err.println("reading the input graph...");
@@ -150,6 +172,7 @@ public class Main {
 	public static void main(String[] args) {
 		Main main = new Main();
 		args = SetOpt.setOpt(main, args);
-		main.run(args[0]);
+//		main.run(args[0]);
+		main.run2(args[0]);
 	}
 }

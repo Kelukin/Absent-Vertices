@@ -20,7 +20,7 @@ abstract class Graph {
         Arrays.fill(first, -1);
         nodeDegree = new int[vertex_num];
         category = new int[vertex_num];
-        
+//        Arrays.fill(category,-3);
     }
     void initializeEdges(int edge_num){
         this.edge_num = 0;
