@@ -2,6 +2,7 @@ import static java.util.Arrays.*;
 
 import java.util.*;
 
+import fudan.kelukin.data.MIS;
 import tc.wata.data.*;
 import tc.wata.debug.*;
 
@@ -23,9 +24,10 @@ public class VCSolver {
 	int depth = 0, maxDepth = 10, rootDepth;
 	
 	double SHRINK = 0.5;
-	
+	public int taget_opt;
 	public int n, N;
 	public int[][] adj;
+	MIS mis;
 	
 	/**
 	 * current best solution
@@ -64,8 +66,10 @@ public class VCSolver {
 		n = adj.length;
 		// n为点的数目？
 		this.N = N;
+		mis= null;
 		this.adj = adj;
 		opt = n;
+		taget_opt = n;
 		y = new int[N];
 		for (int i = 0; i < n; i++) y[i] = 1;
 		for (int i = n; i < N; i++) y[i] = 2;
@@ -88,7 +92,7 @@ public class VCSolver {
 		packing = new ArrayList<int[]>();
 		modTmp = new int[n];
 	}
-	
+
 	FastSet used;
 	void clear(){
 		fill(y, 1);
@@ -99,10 +103,15 @@ public class VCSolver {
 		modifiedN = 0;
 	}
 	public void reInitializeVertex(int v, int a){
-		clear();
 		set(v,a);
 	}
-	
+
+	public void setOptSize(int opt){
+		this.taget_opt = opt;
+	}
+	public void setMIS(MIS mis){
+		this.mis = mis;
+	}
 	int deg(int v) {
 		Debug.check(x[v] < 0);
 		int deg = 0;
@@ -1132,7 +1141,18 @@ public class VCSolver {
 			return need;
 		}
 	}
-	
+	int misUpperBound(){
+		int ret = crt;
+//		used.clear();
+		for(int i=0;i<n;i++){
+			if(x[i]<0 && mis.getNodeState(i) == 0)	ret++;
+			if(x[i]<0)
+				for(int j:adj[i])
+					if(x[i]==1 && mis.getNodeState(i)==0) ret++;
+		}
+
+		return ret;
+	}
 	boolean decompose() {
 		int[][] vss;
 		try (Stat stat = new Stat("decompose")) {
@@ -1433,7 +1453,16 @@ public class VCSolver {
 				type = 3;
 			}
 		}
+		if(LOWER_BOUND == 4 && mis!=null){
+			tmp = n - misUpperBound();
+			if(lb < tmp){
+				lb = tmp;
+				type = 5;
+			}
+		}
+
 		if (debug >= 2 && depth <= maxDepth) debug("lb: %d (%d), %d%n", lb, type, opt);
+//		if(lb >taget_opt)  lb = n;
 		return lb;
 	}
 	
@@ -1463,7 +1492,7 @@ public class VCSolver {
 	void rec() {
 		if (REDUCTION < 3) Debug.check(packing.size() == 0);
 		if (reduce()) return;
-		if (lowerBound() >= opt) return;
+		if (lowerBound() >= Math.min(opt, taget_opt)) return;
 		if (rn == 0) {
 			if (debug >= 2 && rootDepth <= maxDepth) debug("opt: %d -> %d%n", opt, crt);
 			opt = crt;

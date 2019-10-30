@@ -11,22 +11,31 @@ import tc.wata.util.*;
 import tc.wata.util.SetOpt.*;
 
 public class Main {
-	
-	@Option(abbr = 'r', usage = "0: deg1+dominance+fold2, 1:LP, 2:unconfined+twin+funnel+desk, 3:packing")
+	@Option(abbr = 'u', usage = "0: close the upper bound optimization, 1: using the known MIS to optimize.")
+	public static int upperBound = 1;
+
+	@Option(abbr = 't')
+	public static boolean timeMeasure = false;
+
+	@Option(abbr = 'l', usage = "0: close learning from known MIS, 1: open the learning function.")
+	public static int learn = 1;
+//	@Option(abbr = 'r', usage = "0: deg1+dominance+fold2, 1:LP, 2:unconfined+twin+funnel+desk, 3:packing")
 	public static int reduction = 3;
 	
-	@Option(abbr = 'l', usage = "0: nothing, 1:clique, 2:LP, 3:cycle, 4:all")
+//	@Option(abbr = 'l', usage = "0: nothing, 1:clique, 2:LP, 3:cycle, 4:all")
 	public static int lb = 4;
 	
-	@Option(abbr = 'b', usage = "0:random, 1:mindeg, 2:maxdeg")
+//	@Option(abbr = 'b', usage = "0:random, 1:mindeg, 2:maxdeg")
 	public static int branching = 2;// branching 的策略优先程度
 	
-	@Option(abbr = 'o')
+//	@Option(abbr = 'o')
 	public static boolean outputLP = false;
 	
-	@Option(abbr = 'p', usage = "Print the minimum vertex cover. The size of VC is in the first line. Each of the following lines contains the vertex ID.")
+//	@Option(abbr = 'p', usage = "Print the minimum vertex cover. The size of VC is in the first line. Each of the following lines contains the vertex ID.")
 	public static boolean printVC = false;
-	
+
+	@Option(abbr = 'c')
+	public static boolean check = false;
 	@Option(abbr = 'd')
 	public static int debug = 0;
 	
@@ -80,7 +89,11 @@ public class Main {
 	}
 
 	void run2(String file){
-		MISModifier.to_learn = true;
+		MISModifier.check = check;
+	    MISModifier.upperBound = upperBound;
+		MISGraph.timeMeasure = timeMeasure;
+//	    MISModifier.use_color = true;
+		MISModifier.learn = learn;
 		VCSolver.nBranchings = 0;
 		VCSolver.REDUCTION = reduction;
 		VCSolver.LOWER_BOUND = lb;
@@ -92,13 +105,13 @@ public class Main {
 		int m = 0;
 		for (int i = 0; i < adj.length; i++) m += adj[i].length;
 		m /= 2;
-		System.err.printf("n = %d, m = %d%n", adj.length, m);
+		System.out.printf("n = %d, m = %d%n", adj.length, m);
 		MISModifier misModifier = new MISModifier(adj);
 		long start, end;
 		start = System.currentTimeMillis();
 		misModifier.categoryVertices();
 		end = System.currentTimeMillis();
-		System.err.printf("category time = %.3f%n",  1e-3 * (end - start));
+		System.out.printf("category time = %.3f%n",  1e-3 * (end - start));
 		misModifier.printResult();
 	}
 	void run(String file) {
@@ -110,14 +123,6 @@ public class Main {
 		for (int i = 0; i < adj.length; i++) m += adj[i].length;
 		m /= 2;
 		System.err.printf("n = %d, m = %d%n", adj.length, m);
-		start = System.currentTimeMillis();
-		MISGraph misGraph = new MISGraph(adj);
-		System.err.printf("Build successfully!%n");
-		misGraph.initializedTriangleCnt();
-		end = System.currentTimeMillis();
-		while(misGraph.clear_new_minus_queue()==true);
-		System.err.printf("time = %.3f%n",  1e-3 * (end - start));
-		misGraph.printCnt();
 		VCSolver vc = new VCSolver(adj, adj.length);
 		VCSolver.nBranchings = 0;
 		VCSolver.REDUCTION = reduction;
@@ -132,21 +137,6 @@ public class Main {
 		}
 		System.err.printf("opt = %d, time = %.3f%n", vc.opt, 1e-3 * (end - start));
 		read(file);
-		int opt = vc.opt;
-		Boolean ok = true;
-		for(int i=0;i<adj.length && ok;i++){
-			if(misGraph.category[i] == 3){
-				vc = new VCSolver(adj, adj.length);
-				vc.reInitializeVertex(i,0);
-				vc.solve();
-				if(opt == vc.opt)
-					ok = false;
-//				else System.err.printf("new: %d, old: %d%n", vc.opt, opt);
-			}
-		}
-		if(ok)
-			System.err.printf("OK");
-		else  System.err.printf("Error");
 		int sum = 0;
 		for (int i = 0; i < adj.length; i++) {
 			sum += vc.y[i];

@@ -12,6 +12,7 @@ public class MISGraph extends Graph{
     static int MIRROR = 2;
     static int CHAIN = 3;
     static int BRUFORCE = 4;
+    public  static Boolean timeMeasure = false;
     public  FastSet used;
     public  FastMap quickMap;
     int mirror_threshold = 3;
@@ -130,6 +131,11 @@ public class MISGraph extends Graph{
 
 
     public void initializedTriangleCnt(){
+        long begin=0, end;
+
+        if(timeMeasure)
+        begin = System.currentTimeMillis();
+
         for(int i=0;i < edge_num; i+=2){
             used.clear();;
             int edge_cnt = 0;
@@ -150,10 +156,18 @@ public class MISGraph extends Graph{
             }
             if(edge_cnt == nodeDegree[y] - 1)   addDomination(y,x,state);
         }
-//        System.err.printf("initialized Complete%n");
+        if(timeMeasure){
+            end = System.currentTimeMillis();
+            System.out.printf("The time to complete initializing " +
+                            "triangle count is %.3f %n",
+                    (1e-3)* (end-begin));
+        }
+
+        if(timeMeasure)
+            begin = System.currentTimeMillis();
+
         while(true){
             auxiliaryGraph.clearCheckQueue();
-//            System.err.printf("%d%n",tail);
             if(head ==tail) break;
             else while (head <tail){
                 Pair tmpPair = newMinus[head++];
@@ -166,6 +180,13 @@ public class MISGraph extends Graph{
             if(meetChainCondition(i)){//可能存在由此作为起始的 domination chain
                 tryChainReduction(i);
             }
+        if(timeMeasure){
+            end = System.currentTimeMillis();
+            System.out.printf("The time to first loop deleteNode" +
+                            "triangle count is %.3f %n",
+                    (1e-3)* (end-begin));
+            printCnt();
+        }
     }
 
     public void oracle(int u, int a){
@@ -173,12 +194,14 @@ public class MISGraph extends Graph{
         category[u] = a;
         if(a == 1){
             for(int i = first[u]; i != -1; i = nxt[i]) {
-                deleteNode(endNode[i]);
+                newMinus[tail++] = new Pair(endNode[i], BRUFORCE);
+                category[endNode[i]] = 3;
             }
         }else if(a == 2){
 
-        }else if(a == 3)
-            deleteNode(u);
+        }else if(a == 3){
+            newMinus[tail++] = new Pair(u ,BRUFORCE);
+        }
     }
     Boolean meetChainCondition(int v){
         return category[v]<=0 && dominationDegree[v] !=0 && neighborCnt_dg2[v] != 0;
@@ -197,7 +220,7 @@ public class MISGraph extends Graph{
         }
     }
     public void printCnt(){
-        System.err.printf("mirror reducton: %d, chain reduction: %d " +
+        System.out.printf("mirror reducton: %d, chain reduction: %d " +
                 "domination reduction: %d bruce-forced reduction: %d%n"
                 , mirror_cnt, chain_cnt, domination_cnt, bruce_cnt);
     }
@@ -256,6 +279,7 @@ public class MISGraph extends Graph{
             int v = tmpPair.key, method = tmpPair.value;
             deleteNode(v, method);
         }
+        head = tail = 0;
         while(!chainCheck_stack.empty()){
             int u = chainCheck_stack.pop();
             tryChainReduction(u);
@@ -331,20 +355,24 @@ public class MISGraph extends Graph{
         for (int i = 0; i < vertex_num; i++) ps[i] = -2;
         used.clear();
         used.add(v);
-        for (int i = first[v]; i != -1 ; i = nxt[i])if(category[endNode[i]]<=0){
+        int dv = 0;
+        for (int i = first[v]; i != -1 ; i = nxt[i])if(category[endNode[i]]!=3){
             int u = endNode[i];
             used.add(u);
             ps[u] = -1;
+            dv++;
         }
+        int old_tail = tail;
         for (int i = first[v]; i != -1 ; i = nxt[i]){
             int u = endNode[i];
+            if(category[u] == 3) continue;
             for (int j = first[u]; j != -1; j = nxt[j]){
                 int w = endNode[j];
-                if (category[w] <=0 && used.add(w)) {
-                    int c1 = nodeDegree[v];
+                if (category[w] !=3 && used.add(w)) {
+                    int c1 = dv;
                     for (int k = first[w]; k != -1; k = nxt[k]){
                         int z = endNode[k];
-                        if (ps[z] != -2) {
+                        if (category[z] != 3 && ps[z] != -2) {
                             ps[z] = w;
                             c1--;
                         }
@@ -352,11 +380,11 @@ public class MISGraph extends Graph{
                     boolean ok = true;
                     for(int k2 = first[v]; k2 != -1; k2 = nxt[k2]){
                         int u2 = endNode[k2];
-                        if (ps[u2] != w) {
+                        if (ps[u2] != w && category[u2]!=3) {
                             int c2 = 0;
                             for(int k3 = first[u2]; k3 != -1; k3 = nxt[k3]){
                                 int w2 = endNode[k3];
-                                if (ps[w2] == w) c2++;
+                                if (ps[w2] == w && category[w2]!=3) c2++;
                             }
                             if (c2 != c1 - 1) {
                                 ok = false;
@@ -366,13 +394,15 @@ public class MISGraph extends Graph{
                     }
                     if (ok){
                         newMinus[tail++] = new Pair(w, MIRROR);
-                        category[w] = 3;
+//                        category[w] = 3;
 //                        System.err.printf("mirror:%d%n",w);
 //                        mirror_cnt++;
                     }
                 }
             }
         }
+        for(int i=old_tail;i<tail;i++)
+            category[newMinus[i].key] = 3;
     }
     
     Boolean dfs_find_domination_chain(int no, int node_x, int bf_node, int length){
