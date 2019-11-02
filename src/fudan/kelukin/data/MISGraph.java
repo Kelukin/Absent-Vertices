@@ -8,6 +8,7 @@ import java.util.*;
 
 public class MISGraph extends Graph{
     AuxiliaryGraph auxiliaryGraph;
+    public  static int mode = 4;
     static int DOMINANCE = 1;
     static int MIRROR = 2;
     static int CHAIN = 3;
@@ -25,38 +26,24 @@ public class MISGraph extends Graph{
     Stack<Integer> chainCheck_stack;
     //扔入该队列之前，必须预先设定其category 为3 ，并且检查下
     public int head=0, tail=0;
-    MISGraph(int vertex_num, double alpha){
-            super(vertex_num);
-            neighborCnt_dg2 = new int[vertex_num];
-            dominationDegree = new int[vertex_num];
-            quickMap = new FastMap(vertex_num);
-            used = new FastSet(vertex_num);
-            dominationRel = new HashSet<>();
-            newMinus = new Pair[vertex_num];
-            iter = new int[vertex_num];
-            chainCheck_stack = new Stack<>();
-            generate_graph(alpha);
-            //生成一个alpha稀疏度的图
-            for(int i=0;i<vertex_num;i++)
-                if(nodeDegree[i] == 2)
-                    for(int j = first[i];j !=-1;j = nxt[j]){
-                        int node_z = endNode[j];
-                        neighborCnt_dg2[node_z]++;
-                    }
-        }
     public MISGraph(int[][] edges){
         super(edges.length);
         chainCheck_stack = new Stack<>();
         domination_cnt = mirror_cnt = chain_cnt = 0;
         generate_graph(edges);
         used = new FastSet(vertex_num);
-        neighborCnt_dg2 = new int[vertex_num];
-        dominationDegree = new int[vertex_num];
-        dominationRel = new HashSet<>();
         iter = new int[vertex_num];
+        if(mode >=3){
+            neighborCnt_dg2 = new int[vertex_num];
+            dominationDegree = new int[vertex_num];
+        }
+        if(mode >=2) {
+            dominationRel = new HashSet<>();
+        }
         quickMap = new FastMap(vertex_num);
         newMinus = new Pair[vertex_num];
-        auxiliaryGraph=new AuxiliaryGraph(vertex_num,edge_num);
+        if(mode ==2 || mode == 4)  auxiliaryGraph=new AuxiliaryGraph(vertex_num,edge_num);
+        if(mode >=3)
         for(int i=0;i<vertex_num;i++)
             if(nodeDegree[i] == 2)
                 for(int j = first[i];j !=-1;j = nxt[j]){
@@ -88,6 +75,8 @@ public class MISGraph extends Graph{
             edge_num += nodeDegree[i];
         }
         initializeEdges(edge_num);
+        if(mode>=2)
+            edgeTriangleCnt = new int[edge_num/2];
         for(int i=0;i<vertex_num;i++)
             for(int j:edges[i])
                 if(j>i)
@@ -123,8 +112,9 @@ public class MISGraph extends Graph{
     void addDomination(int node_x, int node_y, Boolean deleteState){
         if(!dominationRel.add(new Pair(node_x, node_y)))
             return;
+        if(mode>=3)
         dominationDegree[node_y]++;
-        if(deleteState)
+        if(deleteState && (mode == 2 || mode == 4))
             auxiliaryGraph.addDomination_mis_graph(node_x, node_y);
     }
 
@@ -166,6 +156,7 @@ public class MISGraph extends Graph{
         if(timeMeasure)
             begin = System.currentTimeMillis();
 
+        if(mode == 2 || mode == 4)
         while(true){
             auxiliaryGraph.clearCheckQueue();
             if(head ==tail) break;
@@ -176,6 +167,7 @@ public class MISGraph extends Graph{
                 deleteNode(x, method);
             }
         }
+        if(mode >=3)
         for(int i=0;i<vertex_num;i++)
             if(meetChainCondition(i)){//可能存在由此作为起始的 domination chain
                 tryChainReduction(i);
@@ -216,7 +208,11 @@ public class MISGraph extends Graph{
         used.add(i);
         if(dfs_find_domination_chain(0, i, -1, 1))//TODO 假设不成立之后进行回溯
         {
-            deleteNode(i,CHAIN);
+            if(category[i]!=3){
+                category[i]=3;
+                newMinus[tail++] = new Pair(i, CHAIN);
+            }
+//            deleteNode(i,CHAIN);
         }
     }
     public void printCnt(){
@@ -246,6 +242,7 @@ public class MISGraph extends Graph{
         deleteEdgeOneDirection(x, edgeNo);
         deleteEdgeOneDirection(edNode, reverseEdge);
         quickMap.clear();
+        if(mode <=1) return;
         for(int i=first[x]; i != -1; i = nxt[i])    quickMap.setValue(endNode[i],i);
         for(int i = first[edNode]; i != -1; i = nxt[i]){
             int value = quickMap.getValue(endNode[i]);
@@ -256,6 +253,7 @@ public class MISGraph extends Graph{
         }
         edgeTriangleCnt[edgeNo>>1] = 0;
         // the following code is new
+        if(mode ==2) return;
         for(int j = first[edNode]; j != -1; j = nxt[j])
             if(nodeDegree[edNode] -1 == edgeTriangleCnt[j>>1]
                     && !dominationRel.contains(new Pair(edNode,endNode[j]))){
@@ -272,6 +270,8 @@ public class MISGraph extends Graph{
 
     public Boolean clear_new_minus_queue(){
         //初始化之后，没每新确认一批节点，则调用该接口进行更新
+        if(mode<=1) return false;
+        if(mode == 2 || mode == 4)
         auxiliaryGraph.clearCheckQueue();
         if(head == tail && chainCheck_stack.empty()) return false;
         while(head != tail){
@@ -284,9 +284,15 @@ public class MISGraph extends Graph{
             int u = chainCheck_stack.pop();
             tryChainReduction(u);
         }
+        while(head!=tail){
+            Pair tmpPair = newMinus[head++];
+            int v = tmpPair.key, method = tmpPair.value;
+            deleteNode(v, method);
+        }
         return true;
     }
     void increaseDegree2Neighbor(int v, int a){
+        if(mode<=2) return;
         //v 原本degree 为2 但已经不再是了
         for(int i = first[v]; i != -1 ;i = nxt[i]){
             int u = endNode[i];
@@ -303,17 +309,21 @@ public class MISGraph extends Graph{
         if(first[x] == -1) return;
         //认为x的类别属于minus
         category[x] = 3;
-        auxiliaryGraph.deleteNode_mis_graph(x);
-        for(int deleteVertex :auxiliaryGraph.nodeDominationRel[x]){
-            dominationRel.remove(new Pair(deleteVertex, x));
+        if(mode == 2 || mode == 4){
+            auxiliaryGraph.deleteNode_mis_graph(x);
+            for(int deleteVertex :auxiliaryGraph.nodeDominationRel[x]){
+                dominationRel.remove(new Pair(deleteVertex, x));
+            }
         }
+        if(mode>=3)
         dominationDegree[x] = 0;
         if(method != DOMINANCE) mirrors_reduction(x);
-        if(nodeDegree[x] == 2)
+        if(mode>=3 && nodeDegree[x] == 2)
             increaseDegree2Neighbor(x, -1);
         for(int tmp = first[x]; tmp != -1;){
             int z = nxt[tmp];
             int u = endNode[tmp];
+            if(mode>=3)
             if(dominationRel.remove(new Pair(x, u))){
                 dominationDegree[u]--;
             }
@@ -369,10 +379,10 @@ public class MISGraph extends Graph{
             for (int j = first[u]; j != -1; j = nxt[j]){
                 int w = endNode[j];
                 if (category[w] !=3 && used.add(w)) {
-                    int c1 = dv;
+                    int c1 = dv;//the size of assumed clique
                     for (int k = first[w]; k != -1; k = nxt[k]){
                         int z = endNode[k];
-                        if (category[z] != 3 && ps[z] != -2) {
+                        if (category[z] != 3 && ps[z] != -2) {// the sharing neighbor of u and  w
                             ps[z] = w;
                             c1--;
                         }
@@ -384,7 +394,7 @@ public class MISGraph extends Graph{
                             int c2 = 0;
                             for(int k3 = first[u2]; k3 != -1; k3 = nxt[k3]){
                                 int w2 = endNode[k3];
-                                if (ps[w2] == w && category[w2]!=3) c2++;
+                                if (ps[w2] != w && ps[w2]!=-2&& category[w2]!=3) c2++;
                             }
                             if (c2 != c1 - 1) {
                                 ok = false;
@@ -432,7 +442,9 @@ public class MISGraph extends Graph{
                             category[node_x] = 1;
                             if(category[node_y] <= 0)
                             {
-                                deleteNode(node_y, CHAIN);
+                                category[node_y] = 3;
+                                newMinus[tail++] = new Pair(node_y,CHAIN);
+//                                deleteNode(node_y, CHAIN);
                             }
                             return true;//找到了这么一条串
                         }
@@ -446,9 +458,9 @@ public class MISGraph extends Graph{
                         node_y != bf_node && !used.get(node_y)){
                     //进行一些临时删除操作 也可以不
                     if(dfs_find_domination_chain(no+1, node_y, node_x,length+1)){
-//                        if(category[node_x] == 3 ){
-                            deleteNode(node_x, CHAIN);
-//                        }
+                        category[node_x] = 3;
+                        newMinus[tail++] = new Pair(node_x,CHAIN);
+//                            deleteNode(node_x, CHAIN);
                         return true;
                     }
                 }
@@ -483,6 +495,8 @@ public class MISGraph extends Graph{
             used = new FastSet(vertex_num);
             // 注意不要再外部调用quickMap的时候调用内部类种设计quickMap的方法
             initializeEdges(edge_num);
+            if(mode>=2)
+                edgeTriangleCnt = new int[edge_num/2];
         }
         
         void addDomination(int x, int y) {

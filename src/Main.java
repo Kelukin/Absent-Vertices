@@ -2,8 +2,13 @@ import static java.lang.Math.*;
 import static java.util.Arrays.*;
 
 import java.io.*;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryPoolMXBean;
+import java.lang.management.MemoryType;
 import java.util.*;
 
+import fudan.kelukin.data.MIS;
 import fudan.kelukin.data.MISGraph;
 import tc.wata.debug.*;
 import tc.wata.io.*;
@@ -14,11 +19,13 @@ public class Main {
 	@Option(abbr = 'u', usage = "0: close the upper bound optimization, 1: using the known MIS to optimize.")
 	public static int upperBound = 1;
 
+	@Option(abbr = 'w', usage = "0: Bruce-forced, 1: Synthetical, 2: Syn+EDR, 3: Syn+D-Chain, 4: SED")
+	public static int workMode = 4;
 	@Option(abbr = 't')
 	public static boolean timeMeasure = false;
 
-	@Option(abbr = 'l', usage = "0: close learning from known MIS, 1: open the learning function.")
-	public static int learn = 1;
+//	@Option(abbr = 'l', usage = "0: close learning from known MIS, 1: open the learning function.")
+//	public static int learn = 1;
 //	@Option(abbr = 'r', usage = "0: deg1+dominance+fold2, 1:LP, 2:unconfined+twin+funnel+desk, 3:packing")
 	public static int reduction = 3;
 	
@@ -35,7 +42,7 @@ public class Main {
 	public static boolean printVC = false;
 
 	@Option(abbr = 'c')
-	public static boolean check = false;
+	public static boolean check = true;
 	@Option(abbr = 'd')
 	public static int debug = 0;
 	
@@ -89,11 +96,13 @@ public class Main {
 	}
 
 	void run2(String file){
+		MISGraph.mode = workMode;
+		MISModifier.mode = workMode;
 		MISModifier.check = check;
 	    MISModifier.upperBound = upperBound;
 		MISGraph.timeMeasure = timeMeasure;
 //	    MISModifier.use_color = true;
-		MISModifier.learn = learn;
+//		MISModifier.learn = learn;
 		VCSolver.nBranchings = 0;
 		VCSolver.REDUCTION = reduction;
 		VCSolver.LOWER_BOUND = lb;
@@ -164,5 +173,16 @@ public class Main {
 		args = SetOpt.setOpt(main, args);
 //		main.run(args[0]);
 		main.run2(args[0]);
+		List<MemoryPoolMXBean> pools = ManagementFactory.getMemoryPoolMXBeans();
+		long total = 0;
+		for(MemoryPoolMXBean memoryPoolMXBean : pools){
+			if(memoryPoolMXBean.getType() == MemoryType.HEAP){
+				long peakUsed = memoryPoolMXBean.getPeakUsage().getUsed();
+				System.out.println("Peak used for:" + memoryPoolMXBean.getName() + "is:" + peakUsed );
+				total += peakUsed;
+			}
+		}
+		System.out.println("Total heap peak used:" + total);
+		System.out.println(ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed());
 	}
 }

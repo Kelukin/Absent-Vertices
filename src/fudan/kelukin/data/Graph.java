@@ -27,8 +27,7 @@ abstract class Graph {
         nxt =new int [edge_num];
         endNode = new int [edge_num];
         edgeBefore = new int[edge_num];
-        edgeTriangleCnt = new int[edge_num/2];
-        
+
         Arrays.fill(nxt, -1);
         Arrays.fill(endNode, -1);
         Arrays.fill(edgeBefore, -1);

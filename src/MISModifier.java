@@ -5,6 +5,7 @@ import tc.wata.debug.Debug;
 
 public class MISModifier {
     public static int learn = 1;
+    public static int mode = 4;
     public static Boolean use_color = true;
     public static int upperBound = 1;
     public static Boolean check=false;
@@ -19,16 +20,22 @@ public class MISModifier {
     public MISModifier(int[][] adj){
         cnt_mis_solver = 0;
         n = adj.length;
-        colors = new MISColor(adj);
         this.adj = adj;
         misGraph = new MISGraph(adj);
         VCSolver vcSolver = new VCSolver(adj, n);
-        vcSolver.lpReduction();
-//        misGraph.initialized_with_lpReduciton(vcSolver.x);
-        vcSolver = new VCSolver(adj,n);
-        mis_size = n - vcSolver.solve();
-        mis = new MIS(vcSolver.y);
         vcs_size = vcSolver.opt;
+        if(mode == 0){
+            learn = 0;
+            mis_size = n - vcSolver.solve();
+            use_color=false;
+        }else{
+            colors = new MISColor(adj);
+            vcSolver.lpReduction();
+//        misGraph.initialized_with_lpReduciton(vcSolver.x);
+            vcSolver = new VCSolver(adj,n);
+            mis_size = n - vcSolver.solve();
+            mis = new MIS(vcSolver.y);
+        }
     }
     private void initialize_using_color_and_opt(VCSolver vc, int u){
         int fu = colors.getColor(u);
@@ -79,15 +86,15 @@ public class MISModifier {
                 VCSolver vcSolver = new VCSolver(adj, adj.length);
                 vcSolver.reInitializeVertex(i, 0);
                 if(mis_size == n - vcSolver.solve()){
-//                    System.out.printf("%d： 3%n", i);
-                    return false;
+                    System.out.printf("%d： 3%n", i);
+//                    return false;
                 }
             }else if(misGraph.category[i] == 1){
                 VCSolver vcSolver = new VCSolver(adj, adj.length);
                 vcSolver.reInitializeVertex(i, 1);
                 if(mis_size == n - vcSolver.solve()){
-//                    System.out.printf("1");
-                    return false;
+                    System.out.printf("1");
+//                    return false;
                 }
             }
         return true;
@@ -106,7 +113,7 @@ public class MISModifier {
         System.out.printf("We have called the module of solving MIS %d times.%n",cnt_mis_solver);
     }
     public void categoryVertices(){
-        misGraph.initializedTriangleCnt();
+        if(mode>=2)  misGraph.initializedTriangleCnt();
         while(misGraph.clear_new_minus_queue());
         System.err.printf("initialize OK!%n");
         for(int i=0;i<n;i++)
@@ -123,7 +130,7 @@ public class MISModifier {
                 updateMISGraph(i, kind);
 //                System.err.printf("vertex:%d kind:%d%n",i, kind);
             }
-        if(check)
+        if(check&&mode>0)
         Debug.check(check());
     }
     public void categoryVertices_with_priority(){
