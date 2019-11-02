@@ -15,6 +15,7 @@ public class MISModifier {
     public int mis_size;
     int cnt_mis_solver;
     int[][] adj;
+    int[] category;
     int n;
     int vcs_size;
     public MISModifier(int[][] adj){
@@ -22,12 +23,14 @@ public class MISModifier {
         n = adj.length;
         this.adj = adj;
         misGraph = new MISGraph(adj);
+        category = misGraph.category;
         VCSolver vcSolver = new VCSolver(adj, n);
         vcs_size = vcSolver.opt;
         if(mode == 0){
             learn = 0;
             mis_size = n - vcSolver.solve();
             use_color=false;
+            upperBound=0;
         }else{
             colors = new MISColor(adj);
             vcSolver.lpReduction();
@@ -51,6 +54,11 @@ public class MISModifier {
         }
         if(use_color)
             initialize_using_color_and_opt(vc, u);
+        for(int i=0;i<n;i++)
+            if((category[i]==1 || category[i]==3) && vc.x[i]<0){
+                if(category[i]==3)  vc.reInitializeVertex(i, 1);
+                else    vc.reInitializeVertex(i, 0);
+            }
     }
     Boolean try_asterisk(int u){
         cnt_mis_solver++;
@@ -87,14 +95,14 @@ public class MISModifier {
                 vcSolver.reInitializeVertex(i, 0);
                 if(mis_size == n - vcSolver.solve()){
                     System.out.printf("%d： 3%n", i);
-//                    return false;
+                    return false;
                 }
             }else if(misGraph.category[i] == 1){
                 VCSolver vcSolver = new VCSolver(adj, adj.length);
                 vcSolver.reInitializeVertex(i, 1);
                 if(mis_size == n - vcSolver.solve()){
                     System.out.printf("1");
-//                    return false;
+                    return false;
                 }
             }
         return true;
