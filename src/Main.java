@@ -42,7 +42,7 @@ public class Main {
 	public static boolean printVC = false;
 
 	@Option(abbr = 'c')
-	public static boolean check = true;
+	public static boolean check = false;
 	@Option(abbr = 'd')
 	public static int debug = 0;
 	
@@ -175,14 +175,6 @@ public class Main {
 		main.run2(args[0]);
 		List<MemoryPoolMXBean> pools = ManagementFactory.getMemoryPoolMXBeans();
 		long total = 0;
-		for(MemoryPoolMXBean memoryPoolMXBean : pools){
-			if(memoryPoolMXBean.getType() == MemoryType.HEAP){
-				long peakUsed = memoryPoolMXBean.getPeakUsage().getUsed();
-				System.out.println("Peak used for:" + memoryPoolMXBean.getName() + "is:" + peakUsed );
-				total += peakUsed;
-			}
-		}
-		System.out.println("Total heap peak used:" + total);
 		System.out.println(ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed());
 	}
 }
