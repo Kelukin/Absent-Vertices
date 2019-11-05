@@ -270,7 +270,10 @@ public class MISGraph extends Graph{
 
     public Boolean clear_new_minus_queue(){
         //初始化之后，没每新确认一批节点，则调用该接口进行更新
-        if(mode<=1) return false;
+        if(mode<=1) {
+            tail = head = 0;
+            return false;
+        }
         if(mode == 2 || mode == 4)
         auxiliaryGraph.clearCheckQueue();
         if(head == tail && chainCheck_stack.empty()) return false;
