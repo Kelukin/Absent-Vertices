@@ -1,7 +1,7 @@
 #java -cp ./bin/ Main
 ./build.sh
 runJava="java -cp ./bin Main " 
-fileDirPath=~/Downloads/datasets/dataFiles/
+fileDirPath=~/datasets/
 fileList=$(ls $fileDirPath)
 flag=0
 measure_time=0
@@ -19,6 +19,7 @@ if [ $# != 0 ]; then
 		if [ $z == "-m" ]; then measure_opt=$measure_opt" -m "
 		fi
 		if [ $z == "-loop"]; then loop="t"
+		fi
 	done
 fi
 if [ $loop == "f" ]; then
