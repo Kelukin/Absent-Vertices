@@ -270,7 +270,7 @@ public class MISGraph extends Graph{
 
     public Boolean clear_new_minus_queue(){
         //初始化之后，没每新确认一批节点，则调用该接口进行更新
-        if(mode<=1) {
+        if(mode==0) {
             tail = head = 0;
             return false;
         }

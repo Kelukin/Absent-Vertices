@@ -18,7 +18,7 @@ if [ $# != 0 ]; then
 		fi
 		if [ $z == "-m" ]; then measure_opt=$measure_opt" -m "
 		fi
-		if [ $z == "-loop"]; then loop="t"
+		if [ $z == "-loop" ]; then loop="t"
 		fi
 	done
 fi
