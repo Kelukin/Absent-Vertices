@@ -23,6 +23,8 @@ public class Main {
 	public static int workMode = 4;
 	@Option(abbr = 't')
 	public static boolean timeMeasure = false;
+	@Option(abbr = 'm')
+	public static boolean memoryMeasure = false;
 
 //	@Option(abbr = 'l', usage = "0: close learning from known MIS, 1: open the learning function.")
 //	public static int learn = 1;
@@ -100,6 +102,7 @@ public class Main {
 		MISModifier.mode = workMode;
 		MISModifier.check = check;
 	    MISModifier.upperBound = upperBound;
+	    MISModifier.memoryMeasure = memoryMeasure;
 		MISGraph.timeMeasure = timeMeasure;
 //	    MISModifier.use_color = true;
 //		MISModifier.learn = learn;

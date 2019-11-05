@@ -9,6 +9,7 @@ public class MISModifier {
     public static Boolean use_color = true;
     public static int upperBound = 1;
     public static Boolean check=false;
+    public static Boolean memoryMeasure = false;
     MISGraph misGraph;
     MISColor colors;
     MIS mis;
@@ -69,6 +70,7 @@ public class MISModifier {
         Debug.check(new_mis_size <= mis_size);
         if(learn==1 && new_mis_size == mis_size)
             misGraph.learn_from_opt(tmpSolver.y, mis_size);
+        if(memoryMeasure) System.gc();
         return new_mis_size == mis_size - 1;
 
     }
@@ -82,11 +84,13 @@ public class MISModifier {
         Debug.check(new_mis_size <= mis_size);
         if(learn==1 && new_mis_size == mis_size)
             misGraph.learn_from_opt(tmpSolver.y, mis_size);
+        if(memoryMeasure) System.gc();
         return new_mis_size < mis_size;
     }
     void updateMISGraph(int u, int kind){
         misGraph.oracle(u, kind);
         while(misGraph.clear_new_minus_queue());
+        if(memoryMeasure) System.gc();
     }
     public Boolean check(){
         for(int i=0;i<n;i++)
@@ -124,7 +128,9 @@ public class MISModifier {
         if(mode>=2)  misGraph.initializedTriangleCnt();
         while(misGraph.clear_new_minus_queue());
         System.err.printf("initialize OK!%n");
-        for(int i=0;i<n;i++)
+        for(int i=0;i<n;i++){
+//            if(i%1000==0)
+//                System.err.println(i);
             if(misGraph.category[i] <= 0){
                 int kind = 2;
                 if(misGraph.category[i] == -1){
@@ -138,6 +144,7 @@ public class MISModifier {
                 updateMISGraph(i, kind);
 //                System.err.printf("vertex:%d kind:%d%n",i, kind);
             }
+        }
         if(check&&mode>0)
         Debug.check(check());
     }
