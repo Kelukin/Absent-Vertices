@@ -124,7 +124,7 @@ public class Main {
 		misModifier.categoryVertices();
 		end = System.currentTimeMillis();
 		System.out.printf("category time = %.3f%n",  1e-3 * (end - start));
-		misModifier.printResult();
+//		misModifier.printResult();
 	}
 	void run(String file) {
 		long start, end;
@@ -147,7 +147,7 @@ public class Main {
 			vc.solve();
 			end = System.currentTimeMillis();
 		}
-		System.err.printf("opt = %d, time = %.3f%n", vc.opt, 1e-3 * (end - start));
+		System.out.printf("opt = %d, time = %.3f%n", vc.opt, 1e-3 * (end - start));
 		read(file);
 		int sum = 0;
 		for (int i = 0; i < adj.length; i++) {
@@ -176,8 +176,7 @@ public class Main {
 		args = SetOpt.setOpt(main, args);
 //		main.run(args[0]);
 		main.run2(args[0]);
-		List<MemoryPoolMXBean> pools = ManagementFactory.getMemoryPoolMXBeans();
-		long total = 0;
-		System.out.println(ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed());
+		System.out.printf("Memory Used: %f MB.%n",ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed()/(1024*1024.0));
+		main.run(args[0]);
 	}
 }
