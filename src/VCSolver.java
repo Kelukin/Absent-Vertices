@@ -92,15 +92,25 @@ public class VCSolver {
 		packing = new ArrayList<int[]>();
 		modTmp = new int[n];
 	}
-
 	FastSet used;
-	void clear(){
+	public void clear(){
+		fill(que, 0);
+		fill(restore,0);
+		fill(level,0);
+		fill(iter,0);
+		fill(modTmp,0);
 		fill(y, 1);
 		fill(x, -1);
 		fill(in, -1);
 		fill(out, -1);
 		rn = opt = n;
+		taget_opt = n;
 		modifiedN = 0;
+		packing.clear();
+		crt = 0;
+		mis=null;
+		used.clear();
+		
 	}
 	public void reInitializeVertex(int v, int a){
 		set(v,a);

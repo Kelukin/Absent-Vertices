@@ -19,13 +19,14 @@ public class MISModifier {
     int[] category;
     int n;
     int vcs_size;
+    VCSolver vcSolver;
     public MISModifier(int[][] adj){
         cnt_mis_solver = 0;
         n = adj.length;
         this.adj = adj;
         misGraph = new MISGraph(adj);
         category = misGraph.category;
-        VCSolver vcSolver = new VCSolver(adj, n);
+        vcSolver = new VCSolver(adj, n);
         vcs_size = vcSolver.opt;
         if(mode == 0){
             learn = 0;
@@ -36,7 +37,8 @@ public class MISModifier {
             colors = new MISColor(adj);
             vcSolver.lpReduction();
 //        misGraph.initialized_with_lpReduciton(vcSolver.x);
-            vcSolver = new VCSolver(adj,n);
+//            vcSolver = new VCSolver(adj,n);
+            vcSolver.clear();
             mis_size = n - vcSolver.solve();
             mis = new MIS(vcSolver.y);
         }
@@ -63,20 +65,21 @@ public class MISModifier {
     }
     Boolean try_asterisk(int u){
         cnt_mis_solver++;
-        VCSolver tmpSolver = new VCSolver(adj, adj.length);
-        tmpSolver.reInitializeVertex(u, 1);
-        optimize_vcsSolver(tmpSolver, u);
-        int new_mis_size = n - tmpSolver.solve();
+        vcSolver.clear();
+        vcSolver.reInitializeVertex(u, 1);
+        optimize_vcsSolver(vcSolver, u);
+        int new_mis_size = n - vcSolver.solve();
         Debug.check(new_mis_size <= mis_size);
         if(learn==1 && new_mis_size == mis_size)
-            misGraph.learn_from_opt(tmpSolver.y, mis_size);
+            misGraph.learn_from_opt(vcSolver.y, mis_size);
         if(memoryMeasure) System.gc();
         return new_mis_size == mis_size - 1;
 
     }
     Boolean try_minus(int u){
         cnt_mis_solver++;
-        VCSolver tmpSolver = new VCSolver(adj, adj.length);
+        VCSolver tmpSolver = vcSolver;
+        tmpSolver.clear();
         tmpSolver.reInitializeVertex(u, 0);
         optimize_vcsSolver(tmpSolver, u);
         int new_mis_size = n - tmpSolver.solve();
@@ -95,14 +98,14 @@ public class MISModifier {
     public Boolean check(){
         for(int i=0;i<n;i++)
             if(misGraph.category[i] == 3){
-                VCSolver vcSolver = new VCSolver(adj, adj.length);
+                vcSolver.clear();
                 vcSolver.reInitializeVertex(i, 0);
                 if(mis_size == n - vcSolver.solve()){
                     System.out.printf("%d： 3%n", i);
                     return false;
                 }
             }else if(misGraph.category[i] == 1){
-                VCSolver vcSolver = new VCSolver(adj, adj.length);
+                vcSolver.clear();
                 vcSolver.reInitializeVertex(i, 1);
                 if(mis_size == n - vcSolver.solve()){
                     System.out.printf("1");

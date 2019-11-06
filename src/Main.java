@@ -20,7 +20,7 @@ public class Main {
 	public static int upperBound = 1;
 
 	@Option(abbr = 'w', usage = "0: Bruce-forced, 1: Synthetical, 2: Syn+EDR, 3: Syn+D-Chain, 4: SED")
-	public static int workMode = 4;
+	public static int workMode = 1;
 	@Option(abbr = 't')
 	public static boolean timeMeasure = false;
 	@Option(abbr = 'm')
@@ -142,10 +142,16 @@ public class Main {
 		VCSolver.BRANCHING = branching;
 		VCSolver.outputLP = outputLP;
 		VCSolver.debug = debug;
+		int ans1;
 		try (Stat stat = new Stat("solve")) {
 			start = System.currentTimeMillis();
-			vc.solve();
+			ans1 = vc.solve();
 			end = System.currentTimeMillis();
+		}
+		vc.clear();
+		if(vc.solve() != ans1){
+			System.err.printf("Error!%n");
+			return;
 		}
 		System.out.printf("opt = %d, time = %.3f%n", vc.opt, 1e-3 * (end - start));
 		read(file);
@@ -177,6 +183,6 @@ public class Main {
 //		main.run(args[0]);
 		main.run2(args[0]);
 		System.out.printf("Memory Used: %f MB.%n",ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed()/(1024*1024.0));
-		main.run(args[0]);
+//		main.run(args[0]);
 	}
 }
