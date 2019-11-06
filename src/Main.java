@@ -124,7 +124,7 @@ public class Main {
 		misModifier.categoryVertices();
 		end = System.currentTimeMillis();
 		System.out.printf("category time = %.3f%n",  1e-3 * (end - start));
-//		misModifier.printResult();
+		misModifier.printResult();
 	}
 	void run(String file) {
 		long start, end;
