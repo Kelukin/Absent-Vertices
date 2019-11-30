@@ -9,10 +9,10 @@ import java.util.*;
 public class MISGraph extends Graph{
     AuxiliaryGraph auxiliaryGraph;
     public  static int mode = 4;
-    static int DOMINANCE = 1;
-    static int MIRROR = 2;
-    static int CHAIN = 3;
-    static int BRUFORCE = 4;
+    public static int DOMINANCE = 1;
+    public static int MIRROR = 2;
+    public static int CHAIN = 3;
+    public static int BRUFORCE = 4;
     public  static Boolean timeMeasure = false;
     public  FastSet used;
     public  FastMap quickMap;
@@ -21,6 +21,7 @@ public class MISGraph extends Graph{
     int[] dominationDegree;
     int[] neighborCnt_dg2;
     int[] iter;
+    public  int[] deleteMethod;
     int domination_cnt, chain_cnt, mirror_cnt, bruce_cnt;
     public Pair[] newMinus;
     Stack<Integer> chainCheck_stack;
@@ -28,6 +29,9 @@ public class MISGraph extends Graph{
     public int head=0, tail=0;
     public MISGraph(int[][] edges){
         super(edges.length);
+        
+        deleteMethod = new int[edges.length];
+        
         chainCheck_stack = new Stack<>();
         domination_cnt = mirror_cnt = chain_cnt = 0;
         generate_graph(edges);
@@ -352,6 +356,11 @@ public class MISGraph extends Graph{
         else if(method == MIRROR) mirror_cnt++;
         else if(method == DOMINANCE) domination_cnt++;
         else if(method == BRUFORCE) bruce_cnt++;
+        
+        if(deleteMethod != null){
+            deleteMethod[x] = method;
+        }
+        
     }
     @Override
     void deleteNode(int x) {
