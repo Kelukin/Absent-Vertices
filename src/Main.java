@@ -19,7 +19,7 @@ public class Main {
 	@Option(abbr = 'u', usage = "0: close the upper bound optimization, 1: using the known MIS to optimize.")
 	public static int upperBound = 1;
 
-	@Option(abbr = 'w', usage = "0: Bruce-forced, 1: Synthetical, 2: Syn+EDR, 3: Syn+D-Chain, 4: SED")
+	@Option(abbr = 'w', usage = "0: Brute-force, 1: Synthetical, 2: Syn+EDR, 3: Syn+D-Chain, 4: SED")
 	public static int workMode = 1;
 	@Option(abbr = 't')
 	public static boolean timeMeasure = false;
