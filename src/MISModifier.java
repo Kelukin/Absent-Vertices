@@ -130,17 +130,7 @@ public class MISModifier {
         System.out.printf("MIS Size:%d%n",mis_size);
         System.out.printf("We have called the module of solving MIS %d times.%n",cnt_mis_solver);
     }
-    private Boolean check_V_minus_property(){
-        for(int i=0;i<n;i++)
-            if(misGraph.category[i] == 3 && misGraph.deleteMethod[i]==MISGraph.BRUFORCE){
-                Boolean tmp = false;
-                for(int v:adj[i])
-                    if(category[v]==1)
-                        tmp = true;
-                if(!tmp)    return false;
-            }
-        return true;
-    }
+
     public void categoryVertices(){
         if(mode>=2)  misGraph.initializedTriangleCnt();
         while(misGraph.clear_new_minus_queue());
@@ -164,12 +154,6 @@ public class MISModifier {
         }
         if(check&&mode>0)
         Debug.check(check());
-        
-        if(check_V_minus_property()){
-            System.err.println("the property is true");
-        }
-        else
-            System.err.println("the property is false");
     }
     public void categoryVertices_with_priority(){
         //考虑在验证部分台添加优先级模块以进行加速
