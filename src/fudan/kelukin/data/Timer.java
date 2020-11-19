@@ -31,4 +31,7 @@ public class Timer {
     public static long getPassedTime(){
         return endTime - startTime;
     }
+    public static long getCurrentPassedTime(){
+        return (System.currentTimeMillis() - startTime) / 1000;
+    }
 }

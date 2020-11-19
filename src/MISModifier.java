@@ -138,7 +138,8 @@ public class MISModifier {
         while(misGraph.clear_new_minus_queue());
         System.err.printf("initialize OK!%n");
         for(int i=0;i<n;i++){
-            if(stopTimeSetting && Timer.getPassedTime() >= 512)
+            long t = Timer.getCurrentPassedTime();
+            if(stopTimeSetting && t >= 512)
                 break;
 //            if(i%1000==0)
 //                System.err.println(i);
