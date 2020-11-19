@@ -3,6 +3,7 @@ import fudan.kelukin.data.MIS;
 import fudan.kelukin.data.MISColor;
 import fudan.kelukin.data.MISGraph;
 import tc.wata.debug.Debug;
+import fudan.kelukin.data.Timer;
 
 public class MISModifier {
     public static int learn = 1;
@@ -11,6 +12,7 @@ public class MISModifier {
     public static int upperBound = 1;
     public static Boolean check=false;
     public static Boolean memoryMeasure = false;
+    public static Boolean stopTimeSetting = false;
     MISGraph misGraph;
     MISColor colors;
     MIS mis;
@@ -136,6 +138,8 @@ public class MISModifier {
         while(misGraph.clear_new_minus_queue());
         System.err.printf("initialize OK!%n");
         for(int i=0;i<n;i++){
+            if(stopTimeSetting && Timer.getPassedTime() >= 512)
+                break;
 //            if(i%1000==0)
 //                System.err.println(i);
             if(misGraph.category[i] <= 0){
