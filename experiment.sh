@@ -1,11 +1,12 @@
+#!/bin/bash
 #java -cp ./bin/ Main
-./build.sh
-runJava="java -cp ./bin Main " 
-fileDirPath=~/datasets/
+#./build.sh
+runJava="java -Xmx40960m -cp ./bin Main " 
+fileDirPath=~/datasets/dataFiles/
 fileList=$(ls $fileDirPath)
 flag=0
 measure_time=0
-measure_opt=""
+measure_opt="-s "
 loop="f"
 if [ $# != 0 ]; then
 	for z in $@
@@ -24,6 +25,7 @@ if [ $# != 0 ]; then
 fi
 if [ $loop == "f" ]; then
 	#clear the file
+	echo "yes"
 	echo " " > record.txt
 	for i in $fileList
 	do
@@ -49,11 +51,13 @@ if [ $loop == "f" ]; then
 	fi
 	mv record.txt $newFileName
 else
-	for workMode in 0 1 2 3 4; do
+	for workMode in 4 3 2 1 0; do
 		work_opt="-w "$workMode
 		echo $work_opt
 		outputFile=record_$workMode.txt
 		touch $outputFile
+		echo $measure_opt
+		echo $work_opt
 		for i in $fileList
 		do
 			echo $i
