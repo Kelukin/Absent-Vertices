@@ -7,7 +7,7 @@ import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryType;
 import java.util.*;
-
+import fudan.kelukin.data.Timer;
 import fudan.kelukin.data.MIS;
 import fudan.kelukin.data.MISGraph;
 import tc.wata.debug.*;
@@ -26,6 +26,8 @@ public class Main {
 	@Option(abbr = 'm')
 	public static boolean memoryMeasure = false;
 
+	@Option(abbr = 's')
+	public static boolean stopTimeSetting = false;
 //	@Option(abbr = 'l', usage = "0: close learning from known MIS, 1: open the learning function.")
 //	public static int learn = 1;
 //	@Option(abbr = 'r', usage = "0: deg1+dominance+fold2, 1:LP, 2:unconfined+twin+funnel+desk, 3:packing")
@@ -98,11 +100,13 @@ public class Main {
 	}
 
 	void run2(String file){
+		System.err.printf("The work module is %d$n", workMode);
 		MISGraph.mode = workMode;
 		MISModifier.mode = workMode;
 		MISModifier.check = check;
 	    MISModifier.upperBound = upperBound;
 	    MISModifier.memoryMeasure = memoryMeasure;
+	    MISModifier.stopTimeSetting = stopTimeSetting;
 		MISGraph.timeMeasure = timeMeasure;
 //	    MISModifier.use_color = true;
 //		MISModifier.learn = learn;
@@ -120,10 +124,12 @@ public class Main {
 		System.out.printf("n = %d, m = %d%n", adj.length, m);
 		MISModifier misModifier = new MISModifier(adj);
 		long start, end;
-		start = System.currentTimeMillis();
+		Timer.setStartTime(System.currentTimeMillis());
+		//start = System.currentTimeMillis();
 		misModifier.categoryVertices();
-		end = System.currentTimeMillis();
-		System.out.printf("category time = %.3f%n",  1e-3 * (end - start));
+		Timer.setEndTime(System.currentTimeMillis());
+		//end = System.currentTimeMillis();
+		System.out.printf("category time = %.3f%n",  1e-3 * Timer.getPassedTime());
 		misModifier.printResult();
 	}
 	void run(String file) {
@@ -182,7 +188,8 @@ public class Main {
 		args = SetOpt.setOpt(main, args);
 //		main.run(args[0]);
 		main.run2(args[0]);
-		System.out.printf("Memory Used: %f MB.%n",ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed()/(1024*1024.0));
+		Timer.printIncrementalProcess();
+		//System.out.printf("Memory Used: %f MB.%n",ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed()/(1024*1024.0));
 //		main.run(args[0]);
 	}
 }

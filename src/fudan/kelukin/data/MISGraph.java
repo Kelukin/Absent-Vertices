@@ -3,7 +3,9 @@ package fudan.kelukin.data;
 import tc.wata.data.FastMap;
 import tc.wata.data.FastSet;
 import tc.wata.debug.Debug;
+import fudan.kelukin.data.Timer;
 
+import java.sql.Time;
 import java.util.*;
 
 public class MISGraph extends Graph{
@@ -191,12 +193,14 @@ public class MISGraph extends Graph{
         if(a == 1){
             for(int i = first[u]; i != -1; i = nxt[i]) {
                 newMinus[tail++] = new Pair(endNode[i], BRUFORCE);
+                Timer.foundMinus();
                 category[endNode[i]] = 3;
             }
         }else if(a == 2){
 
         }else if(a == 3){
             newMinus[tail++] = new Pair(u ,BRUFORCE);
+            Timer.foundMinus();
         }
     }
     Boolean meetChainCondition(int v){
@@ -215,6 +219,7 @@ public class MISGraph extends Graph{
             if(category[i]!=3){
                 category[i]=3;
                 newMinus[tail++] = new Pair(i, CHAIN);
+                Timer.foundMinus();
             }
 //            deleteNode(i,CHAIN);
         }
@@ -424,6 +429,7 @@ public class MISGraph extends Graph{
                     }
                     if (ok){
                         newMinus[tail++] = new Pair(w, MIRROR);
+                        Timer.foundMinus();
 //                        category[w] = 3;
 //                        System.err.printf("mirror:%d%n",w);
 //                        mirror_cnt++;
@@ -464,6 +470,7 @@ public class MISGraph extends Graph{
                             {
                                 category[node_y] = 3;
                                 newMinus[tail++] = new Pair(node_y,CHAIN);
+                                Timer.foundMinus();
 //                                deleteNode(node_y, CHAIN);
                             }
                             return true;//找到了这么一条串
@@ -480,6 +487,7 @@ public class MISGraph extends Graph{
                     if(dfs_find_domination_chain(no+1, node_y, node_x,length+1)){
                         category[node_x] = 3;
                         newMinus[tail++] = new Pair(node_x,CHAIN);
+                        Timer.foundMinus();
 //                            deleteNode(node_x, CHAIN);
                         return true;
                     }
@@ -579,6 +587,7 @@ public class MISGraph extends Graph{
             Pair[] que = MISGraph.this.newMinus;
             if(MISGraph.this.category[nodeNo]!=3) {
                 que[MISGraph.this.tail++] = new Pair(nodeNo, DOMINANCE);//将其加入父类的删除当中
+                Timer.foundMinus();
 //                MISGraph.this.domination_cnt++;
             }
             MISGraph.this.category[nodeNo] = 3;
@@ -671,7 +680,7 @@ public class MISGraph extends Graph{
             int tmp = addEdge(x,y);
             check_edgeNO.push(tmp); check_node.push(y);
         }
-        public void oracle(int u, int kind){}
+
         public void deleteNode_mis_graph(int v){
             //TODO
             //外部mis_graph当中发现了点x作为V^- 时将其周围的点进行删除
