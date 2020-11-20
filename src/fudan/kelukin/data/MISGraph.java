@@ -189,11 +189,12 @@ public class MISGraph extends Graph{
 
     public void oracle(int u, int a){
         //oracle tells that u's category is `a`.
+        if(category[u] > 0) return;
         category[u] = a;
         if(a == 1){
             for(int i = first[u]; i != -1; i = nxt[i]) {
+                if(category[endNode[i]] > 0)    continue;
                 newMinus[tail++] = new Pair(endNode[i], BRUFORCE);
-                Timer.foundMinus();
                 category[endNode[i]] = 3;
             }
         }else if(a == 2){
@@ -427,7 +428,7 @@ public class MISGraph extends Graph{
                             }
                         }
                     }
-                    if (ok){
+                    if (ok && category[w] <= 0){
                         newMinus[tail++] = new Pair(w, MIRROR);
                         Timer.foundMinus();
 //                        category[w] = 3;
