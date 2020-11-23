@@ -196,6 +196,7 @@ public class MISGraph extends Graph{
                 if(category[endNode[i]] > 0)    continue;
                 newMinus[tail++] = new Pair(endNode[i], BRUFORCE);
                 category[endNode[i]] = 3;
+                Timer.foundMinus();
             }
         }else if(a == 2){
 
