@@ -188,7 +188,8 @@ public class Main {
 		args = SetOpt.setOpt(main, args);
 //		main.run(args[0]);
 		main.run2(args[0]);
-		Timer.printIncrementalProcess();
+		if(stopTimeSetting)
+			Timer.printIncrementalProcess();
 		//System.out.printf("Memory Used: %f MB.%n",ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed()/(1024*1024.0));
 //		main.run(args[0]);
 	}
