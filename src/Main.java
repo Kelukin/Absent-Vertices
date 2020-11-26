@@ -154,6 +154,8 @@ public class Main {
 			ans1 = vc.solve();
 			end = System.currentTimeMillis();
 		}
+
+
 		vc.clear();
 		if(vc.solve() != ans1){
 			System.err.printf("Error!%n");
