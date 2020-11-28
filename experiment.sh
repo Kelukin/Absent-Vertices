@@ -6,7 +6,7 @@ fileDirPath=~/datasets/dataFiles/
 fileList=$(ls $fileDirPath)
 flag=0
 measure_time=0
-measure_opt="-s "
+measure_opt=""
 loop="f"
 if [ $# != 0 ]; then
 	for z in $@
@@ -51,7 +51,7 @@ if [ $loop == "f" ]; then
 	fi
 	mv record.txt $newFileName
 else
-	for workMode in 4 3 2 1 0; do
+	for workMode in 0 4 3 2 1; do
 		work_opt="-w "$workMode
 		echo $work_opt
 		outputFile=record_$workMode.txt
@@ -64,6 +64,7 @@ else
 			for times in 0 1 2; do
 				filePath=$fileDirPath$i
 				echo times: $times $filePath >> $outputFile
+				echo $runJava $filePath $measure_opt $work_opt
 				$runJava $filePath $measure_opt $work_opt >> $outputFile
 			done
 		done
