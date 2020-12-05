@@ -1,9 +1,8 @@
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import fudan.kelukin.data.MIS;
-import fudan.kelukin.data.MISColor;
-import fudan.kelukin.data.MISGraph;
+import school.author.data.MIS;
+import school.author.data.MISColor;
+import school.author.data.MISGraph;
 import tc.wata.debug.Debug;
-import fudan.kelukin.data.Timer;
+import school.author.data.Timer;
 
 public class MISModifier {
     public static int learn = 1;

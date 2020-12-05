@@ -1,4 +1,4 @@
-package fudan.kelukin.data;
+package school.author.data;
 
 import java.util.ArrayList;
 

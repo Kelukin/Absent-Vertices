@@ -1,17 +1,10 @@
-import static java.lang.Math.*;
 import static java.util.Arrays.*;
 
 import java.io.*;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
-import java.lang.management.MemoryPoolMXBean;
-import java.lang.management.MemoryType;
-import java.util.*;
-import fudan.kelukin.data.Timer;
-import fudan.kelukin.data.MIS;
-import fudan.kelukin.data.MISGraph;
+
+import school.author.data.Timer;
+import school.author.data.MISGraph;
 import tc.wata.debug.*;
-import tc.wata.io.*;
 import tc.wata.util.*;
 import tc.wata.util.SetOpt.*;
 

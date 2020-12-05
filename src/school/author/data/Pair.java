@@ -1,4 +1,4 @@
-package fudan.kelukin.data;
+package school.author.data;
 
 public class Pair {
     public int key;

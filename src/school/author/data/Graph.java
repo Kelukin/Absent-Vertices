@@ -1,6 +1,4 @@
-package fudan.kelukin.data;
-
-import tc.wata.data.FastSet;
+package school.author.data;
 
 import java.util.Arrays;
 import java.util.HashSet;

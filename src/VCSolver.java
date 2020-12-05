@@ -2,7 +2,7 @@ import static java.util.Arrays.*;
 
 import java.util.*;
 
-import fudan.kelukin.data.MIS;
+import school.author.data.MIS;
 import tc.wata.data.*;
 import tc.wata.debug.*;
 

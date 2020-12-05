@@ -1,11 +1,9 @@
-package fudan.kelukin.data;
+package school.author.data;
 
 import tc.wata.data.FastMap;
 import tc.wata.data.FastSet;
 import tc.wata.debug.Debug;
-import fudan.kelukin.data.Timer;
 
-import java.sql.Time;
 import java.util.*;
 
 public class MISGraph extends Graph{
