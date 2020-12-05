@@ -27,7 +27,7 @@ public class MISGraph extends Graph{
     int domination_cnt, chain_cnt, mirror_cnt, bruce_cnt;
     public Pair[] newMinus;
     Stack<Integer> chainCheck_stack;
-    //扔入该队列之前，必须预先设定其category 为3 ，并且检查下
+    //Assumed it is absent before putting it into the queue
     public int head=0, tail=0;
     public MISGraph(int[][] edges){
         super(edges.length);
@@ -87,15 +87,6 @@ public class MISGraph extends Graph{
             for(int j:edges[i])
                 if(j>i)
                 addEdge(i,j);
-    }
-    public void initialized_with_lpReduciton(int x[]){
-        //输入的x时VCSolver跑了lpReduciton之后得到的部分的x
-        for(int i = 0; i < vertex_num; i++){
-            if(x[i] == 0 && category[i] == 0)
-                category[i] = -1;//Maybe V_asterisk
-            if(x[i] == 1 && category[i] == 0)
-                category[i] = -3;//Maybe V_minus
-        }
     }
     public void learn_from_opt(int[] vc_opt, int mis_size){
         int sum = 0;
@@ -175,7 +166,7 @@ public class MISGraph extends Graph{
         }
         if(mode >=3)
         for(int i=0;i<vertex_num;i++)
-            if(meetChainCondition(i)){//可能存在由此作为起始的 domination chain
+            if(meetChainCondition(i)){//domination chain
                 tryChainReduction(i);
             }
         if(timeMeasure){
@@ -291,7 +282,7 @@ public class MISGraph extends Graph{
             if(mode != 0)
                 deleteNode(v, method);
             else{
-                //为method = 0 开启的优化
+                //optimization for method = 0
                 for(int i = first[v]; i != -1; i = nxt[i]){
                     int anotherNode = endNode[i];
                     nodeDegree[anotherNode]--;
@@ -315,7 +306,6 @@ public class MISGraph extends Graph{
     }
     void increaseDegree2Neighbor(int v, int a){
         if(mode<=2) return;
-        //v 原本degree 为2 但已经不再是了
         for(int i = first[v]; i != -1 ;i = nxt[i]){
             int u = endNode[i];
             if(category[u]<=0){
@@ -451,14 +441,12 @@ public class MISGraph extends Graph{
         if(no % 2 == 1){
             for(int i=first[node_x];i !=-1; i = nxt[i]){
                 int node_y = endNode[i];
-                if(category[node_y]<=0 && neighborCnt_dg2[node_y]>=2 && !used.get(node_y))//延长该条串
+                if(category[node_y]<=0 && neighborCnt_dg2[node_y]>=2 && !used.get(node_y))//enlong the chain
                     if(dfs_find_domination_chain(no+1, node_y, node_x, length+1)){
                         category[node_x] = 1;
 //                printf("%d\n",node_x);
                         return true;
-                        //如果找到了这么一条串
                     }
-                //后续调整逻辑，应当优先进行删除清算
                 if(category[node_y]<=0 && dominationDegree[node_y]!=0 && !used.get(node_y) &&
                         bf_node!=node_y &&
                         (dominationRel.contains(new Pair(node_x,node_y)) ||
@@ -475,7 +463,7 @@ public class MISGraph extends Graph{
                                 Timer.foundMinus();
 //                                deleteNode(node_y, CHAIN);
                             }
-                            return true;//找到了这么一条串
+                            return true;
                         }
                 }
             }
@@ -495,10 +483,9 @@ public class MISGraph extends Graph{
                     }
                 }
             }
-            //偶数点，进行删边以及维护
         }
         used.remove(node_x);
-        return false;//无法找到这样子的一个串
+        return false;
     }
     
     
@@ -588,7 +575,7 @@ public class MISGraph extends Graph{
             category[nodeNo] = -1;//deleted Minus Set
             Pair[] que = MISGraph.this.newMinus;
             if(MISGraph.this.category[nodeNo]!=3) {
-                que[MISGraph.this.tail++] = new Pair(nodeNo, DOMINANCE);//将其加入父类的删除当中
+                que[MISGraph.this.tail++] = new Pair(nodeNo, DOMINANCE);
                 Timer.foundMinus();
 //                MISGraph.this.domination_cnt++;
             }
@@ -684,15 +671,11 @@ public class MISGraph extends Graph{
         }
 
         public void deleteNode_mis_graph(int v){
-            //TODO
-            //外部mis_graph当中发现了点x作为V^- 时将其周围的点进行删除
-            //新发现的不满足要求的也要丢入至newMinus当中
             if(category[v] == -1) return;
             if(category[v] == 2)
                 set_minus(v);
             else
                 set_minus(v);
-//                Debug.check(false);
         }
     }
     

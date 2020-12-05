@@ -41,8 +41,6 @@ public class MISModifier {
         }else{
             colors = new MISColor(adj);
             vcSolver.lpReduction();
-//        misGraph.initialized_with_lpReduciton(vcSolver.x);
-//            vcSolver = new VCSolver(adj,n);
             vcSolver.clear();
             mis_size = n - vcSolver.solve();
             mis = new MIS(vcSolver.y);
@@ -139,34 +137,23 @@ public class MISModifier {
         System.err.printf("initialize OK!%n");
         for(int i=0;i<n;i++){
             long t = Timer.getCurrentPassedTime();
-            if(stopTimeSetting && t >= 512)
+            if(stopTimeSetting && t >= 512) // the 512 is the predefined running time threshold
                 break;
-//            if(i%1000==0)
-//                System.err.println(i);
             if(misGraph.category[i] <= 0){
                 int kind = 2;
                 if(misGraph.category[i] == -1){
-                    if(mode != 0)  continue;
-                    if(try_asterisk(i)) kind = 1;
+                    kind = 1;
                 }else if(misGraph.category[i] == -3){
                     if(try_minus(i)) kind = 3;
                 }else{//category = 0
-                    if(mode == 0){
-                        if(try_asterisk(i)) kind = 1;
-                        else if(try_minus(i)) kind = 3;
-                    }else{
-                        if(try_minus(i)) kind = 3;
-                        else continue;
-                    }
+                    if(try_asterisk(i)) kind = 1;
+                    else if(try_minus(i)) kind = 3;
+                    
                 }
                 updateMISGraph(i, kind);
-//                System.err.printf("vertex:%d kind:%d%n",i, kind);
             }
         }
         if(check&&mode>0)
         Debug.check(check());
-    }
-    public void categoryVertices_with_priority(){
-        //考虑在验证部分台添加优先级模块以进行加速
     }
 }

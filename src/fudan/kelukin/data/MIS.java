@@ -1,7 +1,7 @@
 package fudan.kelukin.data;
 
 public class MIS {
-    int x[];//0 代表取,1表示不取
+    int x[];
     public MIS(int[] maximumIndependtSet){
         x = maximumIndependtSet.clone();
     }

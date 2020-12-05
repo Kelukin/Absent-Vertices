@@ -37,7 +37,7 @@ public class Main {
 	public static int lb = 4;
 	
 //	@Option(abbr = 'b', usage = "0:random, 1:mindeg, 2:maxdeg")
-	public static int branching = 2;// branching 的策略优先程度
+	public static int branching = 2;
 	
 //	@Option(abbr = 'o')
 	public static boolean outputLP = false;
