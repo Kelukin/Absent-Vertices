@@ -1,5 +1,4 @@
-# vertex cover solver
-http://epubs.siam.org/doi/abs/10.1137/1.9781611973754.7
+# Incrementally Finding the  Vertices Absent from Maximum Independent Sets
 
 ## How to compile:
     $ ./build.sh
@@ -12,8 +11,7 @@ http://epubs.siam.org/doi/abs/10.1137/1.9781611973754.7
 
 ## List of the input graphs used in the paper:
 - http://snap.stanford.edu/data/
-- http://konect.uni-koblenz.de/
 - http://law.di.unimi.it/datasets.php
-- http://www.cs.hbg.psu.edu/txn131/vertex_cover.html
-- http://www.user.tu-berlin.de/hueffner/occ/
 
+## Acknowledgement
+* Strongly thank to the open project, [vertex_cover](https://github.com/wata-orz/vertex_cover), which our project uses as the basic maximum independent solver.

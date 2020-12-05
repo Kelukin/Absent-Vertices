@@ -20,7 +20,7 @@ public class Main {
 	public static int upperBound = 1;
 
 	@Option(abbr = 'w', usage = "0: Brute-force, 1: Synthetical, 2: Syn+EDR, 3: Syn+D-Chain, 4: SED")
-	public static int workMode = 1;
+	public static int workMode = 4;
 	@Option(abbr = 't')
 	public static boolean timeMeasure = false;
 	@Option(abbr = 'm')
