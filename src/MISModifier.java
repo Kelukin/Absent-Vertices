@@ -165,7 +165,7 @@ public class MISModifier {
             System.out.println(n);
             for(int i = 0; i < n; ++i){
                 if(misGraph.category[i] == 3){
-                    bufferedWriter.write(i);
+                    bufferedWriter.write("" + i);
                     bufferedWriter.write(" ");
                 }
             }
