@@ -171,9 +171,9 @@ public class MISModifier {
                 if(misGraph.category[i] == 3){
                     out.write(i);
                     out.write(" ");
-                    System.out.println(i);
                 }
             }
+            out.flush();
         }catch (IOException e){
             e.printStackTrace();
         }
