@@ -166,6 +166,7 @@ public class MISModifier {
             f.createNewFile();
             FileWriter writer = new FileWriter(f);
             BufferedWriter out = new BufferedWriter(writer);
+            System.out.println(n);
             for(int i = 0; i < n; ++i){
                 if(misGraph.category[i] == 3){
                     out.write(i);
