@@ -124,6 +124,9 @@ public class Main {
 		//end = System.currentTimeMillis();
 		System.out.printf("category time = %.3f%n",  1e-3 * Timer.getPassedTime());
 		misModifier.printResult();
+		
+		// out put the absent vertices.
+		misModifier.outputAbsentVertices(file + "categoryResult.txt");
 	}
 	void run(String file) {
 		long start, end;

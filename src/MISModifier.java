@@ -4,6 +4,11 @@ import school.author.data.MISGraph;
 import tc.wata.debug.Debug;
 import school.author.data.Timer;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class MISModifier {
     public static int learn = 1;
     public static int mode = 4;
@@ -154,5 +159,21 @@ public class MISModifier {
         }
         if(check&&mode>0)
         Debug.check(check());
+    }
+    public void outputAbsentVertices(String file){
+        try{
+            File f = new File(file);
+            f.createNewFile();
+            FileWriter writer = new FileWriter(f);
+            BufferedWriter out = new BufferedWriter(writer);
+            for(int i = 0; i < n; ++i){
+                if(misGraph.category[i] == 3){
+                    out.write(i);
+                    out.write(" ");
+                }
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 }
