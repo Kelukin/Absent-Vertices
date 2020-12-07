@@ -63,22 +63,7 @@ public class Main {
 					}
 				}
 			}
-//			System.out.println(cnt);
 		} catch (IOException e) {
-		}
-	}
-	public void write_kelukin(File file){
-		int m = 0;
-		int n = adj.length;
-		for (int i = 0; i < n; i++) m += adj[i].length;
-		System.err.printf("!!!%d%n",m);
-		long size = 4L * (1 + 1 + m);
-		System.out.printf("%d %d%n",n, m/2);
-		for (int i = 0; i < n; i++) {
-			for (int e : adj[i])
-				if(e > i){
-					System.out.printf("%d %d%n",i,e);
-				}
 		}
 	}
 	void read(String file) {
