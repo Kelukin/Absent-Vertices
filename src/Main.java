@@ -47,8 +47,9 @@ public class Main {
 	int[][] adj;
 	public void outputDegreeInformation(String file, int[][] adj){
 		try {
-			BufferedReader in = new BufferedReader(new FileReader(file + "categoryResult.txt"));
+			BufferedReader in = new BufferedReader(new FileReader(file + ".categoryResult.txt"));
 			String str;
+			int cnt = 0;
 			while ((str = in.readLine()) != null) {
 				System.out.println(str);
 				int tmp = 0;
@@ -56,11 +57,13 @@ public class Main {
 					if(str.charAt(i) == ' '){
 						System.out.printf("%d %d\n", tmp, adj[tmp].length);
 						tmp = 0;
+						++cnt;
 					}else{
 						tmp = tmp * 10 + (str.charAt(i) - '0');
 					}
 				}
 			}
+//			System.out.println(cnt);
 		} catch (IOException e) {
 		}
 	}
@@ -144,9 +147,9 @@ public class Main {
 		//end = System.currentTimeMillis();
 		System.out.printf("category time = %.3f%n",  1e-3 * Timer.getPassedTime());
 		misModifier.printResult();
-
-		// out put the absent vertices.
-		misModifier.outputAbsentVertices(file + ".categoryResult.txt");
+//
+//		// out put the absent vertices.
+//		misModifier.outputAbsentVertices(file + ".categoryResult.txt");
 	}
 	void run(String file) {
 		long start, end;
