@@ -143,13 +143,13 @@ public class MISModifier {
             if(misGraph.category[i] <= 0){
                 int kind = 2;
                 if(misGraph.category[i] == -1){
-                    kind = 1;
+                    if(try_asterisk(i)) kind = 1;
                 }else if(misGraph.category[i] == -3){
                     if(try_minus(i)) kind = 3;
                 }else{//category = 0
                     if(try_asterisk(i)) kind = 1;
                     else if(try_minus(i)) kind = 3;
-                    
+
                 }
                 updateMISGraph(i, kind);
             }

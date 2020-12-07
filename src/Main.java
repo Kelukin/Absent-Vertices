@@ -45,7 +45,25 @@ public class Main {
 	
 	int[] vertexID;
 	int[][] adj;
-
+	public void outputDegreeInformation(String file, int[][] adj){
+		try {
+			BufferedReader in = new BufferedReader(new FileReader(file + "categoryResult.txt"));
+			String str;
+			while ((str = in.readLine()) != null) {
+				System.out.println(str);
+				int tmp = 0;
+				for(int i = 0; i < str.length(); ++i){
+					if(str.charAt(i) == ' '){
+						System.out.printf("%d %d\n", tmp, adj[tmp].length);
+						tmp = 0;
+					}else{
+						tmp = tmp * 10 + (str.charAt(i) - '0');
+					}
+				}
+			}
+		} catch (IOException e) {
+		}
+	}
 	public void write_kelukin(File file){
 		int m = 0;
 		int n = adj.length;
@@ -116,6 +134,8 @@ public class Main {
 		m /= 2;
 		System.out.printf("n = %d, m = %d%n", adj.length, m);
 		MISModifier misModifier = new MISModifier(adj);
+//		outputDegreeInformation(file, adj);
+//		return;
 		long start, end;
 		Timer.setStartTime(System.currentTimeMillis());
 		//start = System.currentTimeMillis();
@@ -124,9 +144,9 @@ public class Main {
 		//end = System.currentTimeMillis();
 		System.out.printf("category time = %.3f%n",  1e-3 * Timer.getPassedTime());
 		misModifier.printResult();
-		
+
 		// out put the absent vertices.
-		misModifier.outputAbsentVertices(file + "categoryResult.txt");
+//		misModifier.outputAbsentVertices(file + "categoryResult.txt");
 	}
 	void run(String file) {
 		long start, end;
