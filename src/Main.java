@@ -146,7 +146,7 @@ public class Main {
 		misModifier.printResult();
 
 		// out put the absent vertices.
-//		misModifier.outputAbsentVertices(file + "categoryResult.txt");
+		misModifier.outputAbsentVertices(file + ".categoryResult.txt");
 	}
 	void run(String file) {
 		long start, end;
